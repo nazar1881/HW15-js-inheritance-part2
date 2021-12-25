@@ -5,7 +5,7 @@ let time3 = document.getElementById('clock3');
 class Clock {
     constructor(el) {
         this.el = el;
-        this.format = true;
+        this.fullFormat = true;
 
         this.el.addEventListener('click', () => {
             this.toggleFormat();
@@ -13,90 +13,60 @@ class Clock {
     }
 
     toggleFormat() {
-        this.format = !this.format;
+        this.fullFormat = !this.fullFormat;
     }
 
     getTime() {
         let date = new Date();
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let seconds = date.getSeconds();
+        let hours = editedTime(date.getHours());
+        let minutes = editedTime(date.getMinutes());
+        let seconds = editedTime(date.getSeconds());
+        let milliSec = date.getMilliseconds();
+        let year = date.getFullYear();
 
-        if (hours < 10) {
-            hours = "0" + hours;
-        }
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
+        return   [hours, minutes, seconds, milliSec, year];
+    }
 
-        return   this.format ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`;
+    timeFormat() {
+        let isFullFormat = `${this.getTime()[0]}:${this.getTime()[1]}:${this.getTime()[2]}`;
+        let isShortFormat = `${this.getTime()[0]}:${this.getTime()[1]}`;
+        return this.fullFormat === true ? isFullFormat : isShortFormat;
     }
 
     render() {
-        this.el.innerText = this.getTime(); 
+        this.el.innerText = this.timeFormat(); 
     }
 
-
+    startClock() {
+        setInterval(() => this.render(), 250);
+    }
 }
 
 class ClockWithMs extends Clock {
-    getTime() {
-        let date = new Date();
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let seconds = date.getSeconds();
-        let milliSec = date.getMilliseconds();
-
-        if (hours < 10) {
-            hours = "0" + hours;
-        }
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
-
-        return   this.format ? `${hours}:${minutes}:${seconds}:${milliSec}` : `${hours}:${minutes}`;
+    timeFormat() {
+        let isFullFormat = `${this.getTime()[0]}:${this.getTime()[1]}:${this.getTime()[2]}:${this.getTime()[3]}`;
+        let isShortFormat = `${this.getTime()[0]}:${this.getTime()[1]}`;
+        return this.fullFormat === true ? isFullFormat : isShortFormat;
     }
 }
 
 class ClockWithYear extends Clock {
-    getTime() {
-        let date = new Date();
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let seconds = date.getSeconds();
-        let year = date.getFullYear();
-
-        if (hours < 10) {
-            hours = "0" + hours;
-        }
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
-
-        return   this.format ? `${hours}:${minutes}:${seconds} - ${year}рiк` : `${hours}:${minutes}`;
+    timeFormat() {
+        let isFullFormat = `${this.getTime()[0]}:${this.getTime()[1]}:${this.getTime()[2]} ${this.getTime()[4]}-рiк`;
+        let isShortFormat = `${this.getTime()[0]}:${this.getTime()[1]}`;
+        return this.fullFormat === true ? isFullFormat : isShortFormat;
     }
 }
 
+function editedTime(timeElement) {
+    return timeElement < 10 ? "0" + timeElement : timeElement;
+}
+
 let parenntClock = new Clock(time1);
-setInterval(() => {
-    parenntClock.render();
-}, 250);
+parenntClock.startClock();
 
 let clockWithMs = new ClockWithMs(time2);
-setInterval(() => {
-    clockWithMs.render();
-}, 250);
+clockWithMs.startClock();
 
 let clockWithYear = new ClockWithYear(time3);
-setInterval(() => {
-    clockWithYear.render();
-}, 250);
+clockWithYear.startClock();
